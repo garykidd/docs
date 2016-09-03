@@ -68,7 +68,7 @@ openaps use --format text howdy shell > howdy.txt
 ```
 
 Now, if there were any tools that needed to use the output from
-`howdy` can retrieve it from the `howdy.txt` file.
+`howdy` they can retrieve that output from the `howdy.txt` file.
 
 What if we take a more complicated example?  Try running these
 commands:
