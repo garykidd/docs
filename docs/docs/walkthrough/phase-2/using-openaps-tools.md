@@ -170,6 +170,7 @@ Go ahead and try some more pump uses to find out what they do. Note that some of
 Now let's try communicating with the Dexcom receiver.
 
 Hint: Your Dexcom should be nearly fully charged before plugging it in to your Raspberry Pi. If, when you plug in your Dexcom, it causes your WiFi dongle to stop blinking, that is a sign that it is drawing too much power and needs to be charged.
+[Add reference to using G5]
 
 `$ openaps use <my_dexcom_name> iter_glucose 1`
 
@@ -212,21 +213,37 @@ Some people have found it more beneficial to pull blood glucose values from Nigh
 1) Similar like above, we need to create a device that talks to Nightscout.  Add this device called "curl" to your list of devices in your openaps.ini file:  <br>
 
 ```
-[device "curl"] <br>
-fields = <br>
-cmd = bash <br>
-vendor = openaps.vendors.process <br>
-args = -c "curl -s https://yourwebsite.azurewebsites.net/api/v1/entries.json | json -e 'this.glucose = this.sgv'" <br>
-```
+$ nightscout autoconfigure-device-crud
 
-In addition, you need to alter your monitor/glucose.json report to use this device rather than the cgms device you setup above.  The report will look like this in your openaps.ini file:
+this does the hashing and configuring so you have an ns device that can both upload and download any content
+it just prints the config generated, so it's safe to run again and again and again to preview
+
+Should get:
+added process://ns/nightscout/ns NIGHTSCOUT_HOST API_SECRET
+process://ns/nightscout/ns <YOUR NS SITE> <[HASHED] API SECRET>
+
+You can then:
+openaps use ns shell get entries.json 'count=10'
+openaps use ns shell upload treatments.json recently/combined-treatments.json
+
+it takes 3 arguments, always you can give it empty string ""
+but it needs 3 arguments seen here
+get $type.json 'count=1' - this will get the latest entry
+entries, treatments, profile, etc...
+
+similar for upload:
+upload $type.json $inputfile
+again, treatments, profile, entries any valid NS endpoint
+
+
+[In addition, you need to alter your monitor/glucose.json report to use this device rather than the cgms device you setup above.  The report will look like this in your openaps.ini file:
   
 ```
 [report "monitor/glucose.json"] <br>
 device = curl <br>
 use = shell <br>
 reporter = text <br>
-```
+```]
 
 Many people will actually setup both ways to pull the blood glucose level and switch between the different devices depending on their needs.  If you are going to pull it directly from Nightscout then you will have to have internet access for the Raspberry Pi.
 
